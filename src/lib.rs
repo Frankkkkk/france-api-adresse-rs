@@ -1,3 +1,25 @@
+//! A minimal wrapper for the Base Adresse Nationale "BAN" french geo API.
+//!
+//! This crate provides functions to query geographical address information
+//! from the [Base Adresse Nationale](https://adresse.data.gouv.fr/) API.
+//!
+//! # Features
+//! - Forward geocoding: convert address strings into coordinates
+//! - Reverse geocoding: convert coordinates into address details
+//!
+//! # Example
+//! ```
+//! use france_api_adresse::{get_address_info, get_reverse_info};
+//!
+//! let address_result = get_address_info("38 Rue des Blancs Manteaux").unwrap();
+//! let reverse_result = get_reverse_info(2.3522, 48.8566).unwrap();
+//! ```
+//!
+//! # Errors
+//! Errors are returned as a custom `Error` enum to distinguish between HTTP,
+//! text extraction, and JSON deserialization failures.
+//!
+//!
 use reqwest::blocking;
 
 use std::error::Error as StdError;
@@ -21,19 +43,21 @@ impl StdError for Error {}
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::HttpError => write!(f, "Can't access to http://api-adresse.data.gouv.fr"),
+            Error::HttpError => write!(f, "Can't access https://data.geopf.fr"),
             Error::GetTextError => write!(f, "Can't unmarshal data response to text"),
             Error::UnmarshalJsonError => write!(f, "Can't unmarshal text response to json"),
         }
     }
 }
 
+/// A list of features (addresses) returned by the API
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AddressResult {
     pub r#type: String,
     pub features: Vec<Feature>,
 }
 
+/// A feature is basically a single address + its coordinates
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Feature {
     pub r#type: String,
@@ -41,12 +65,14 @@ pub struct Feature {
     pub properties: Properties,
 }
 
+/// Basically the point of the address
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Geometry {
     pub r#type: String,
     pub coordinates: Coordinates,
 }
 
+/// Latitude and Longitude, WGS 84 format
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Coordinates {
     #[serde(rename = "0")]
@@ -56,19 +82,26 @@ pub struct Coordinates {
     pub lon: f64,
 }
 
+/// An Address returned by the API
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Properties {
-    pub r#type: String,
     pub id: String,
 
     pub score: f64,
+    /// Full address label
     pub label: String,
 
+    /// X coord in the Lambert-93 projection
     pub x: f64,
+    /// Y coord in the Lambert-93 projection
     pub y: f64,
 
     pub importance: f64,
 
+    /// Type of the address, e.g. "housenumber", "street", …
+    pub r#type: String,
+
+    /// name of the address, I guess housenumber + street
     pub name: String,
 
     pub housenumber: Option<String>,
@@ -104,12 +137,14 @@ fn get_data(url: &str) -> Result<AddressResult, Error> {
     Ok(data)
 }
 
+/// Returns the addresses that match the search query
 pub fn get_address_info(search: &str) -> Result<AddressResult, Error> {
     let url = format!("{}{}", API_URL_SEARCH, search);
 
     get_data(&url)
 }
 
+/// Reverse geocoding: returns the address at the given coordinates
 pub fn get_reverse_info(lon: f64, lat: f64) -> Result<AddressResult, Error> {
     let url = format!("{}lon={}&lat={}", API_URL_REVERSE, lon, lat);
 
