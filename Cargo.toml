@@ -9,7 +9,7 @@ documentation = "https://docs.rs/france-api-adresse"
 homepage = "https://github.com/Frankkkkk/france-api-adresse-rs"
 repository = "https://github.com/Frankkkkk/france-api-adresse-rs"
 keywords = ["france", "adresse", "BAN", "geocoding"]
-categories = ["API bindings"]
+categories = ["api-bindings"]
 
 
 [dependencies]
