@@ -5,6 +5,13 @@ edition = "2024"
 description = "A rust wrapper around France's geocoding 'API Adresse'"
 license = "MIT"
 
+documentation = "https://docs.rs/france-api-adresse"
+homepage = "https://github.com/Frankkkkk/france-api-adresse-rs"
+repository = "https://github.com/Frankkkkk/france-api-adresse-rs"
+keywords = ["france", "adresse", "BAN", "geocoding"]
+categories = ["API bindings"]
+
+
 [dependencies]
 reqwest = { version = "0.12.22", features = ["blocking"] }
 serde = { version = "1.0.219", features = ["derive"] }
