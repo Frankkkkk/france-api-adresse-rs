@@ -29,14 +29,29 @@ impl BAN {
     where
         T: serde::de::DeserializeOwned,
     {
-        let text = reqwest::Client::new()
+        let resp = reqwest::Client::new()
             .get(url)
             .send()
             .await
-            .map_err(Error::HttpError)?
+            .map_err(Error::HttpError)?;
+        let status = resp.status();
+        let text = resp
             .text()
             .await
             .map_err(|e| Error::GetTextError(e.to_string()))?;
+
+        if !status.is_success() {
+            use crate::types::ApiErrorResponse;
+
+            let err = serde_json::from_str::<ApiErrorResponse>(&text)
+                .map_err(|e| Error::UnmarshalJsonError(e.to_string()))?;
+            return Err(Error::ApiError {
+                code: err.code,
+                message: err.message,
+                detail: err.detail,
+            });
+        }
+
         serde_json::from_str(text.as_str()).map_err(|e| Error::UnmarshalJsonError(e.to_string()))
     }
 
@@ -45,12 +60,28 @@ impl BAN {
     where
         T: serde::de::DeserializeOwned,
     {
-        let text = reqwest::blocking::Client::new()
+        let resp = reqwest::blocking::Client::new()
             .get(url)
             .send()
-            .map_err(Error::HttpError)?
+            .map_err(Error::HttpError)?;
+
+        let status = resp.status();
+        let text = resp
             .text()
             .map_err(|e| Error::GetTextError(e.to_string()))?;
+
+        if !status.is_success() {
+            use crate::types::ApiErrorResponse;
+
+            let err = serde_json::from_str::<ApiErrorResponse>(&text)
+                .map_err(|e| Error::UnmarshalJsonError(e.to_string()))?;
+            return Err(Error::ApiError {
+                code: err.code,
+                message: err.message,
+                detail: err.detail,
+            });
+        }
+
         serde_json::from_str(&text).map_err(|e| Error::UnmarshalJsonError(e.to_string()))
     }
 

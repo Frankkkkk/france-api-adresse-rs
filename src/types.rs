@@ -10,6 +10,12 @@ pub enum Error {
     GetTextError(String),
     #[error("Error unmarshalling JSON response: {0}")]
     UnmarshalJsonError(String),
+    #[error("API error: {code} - {message}")]
+    ApiError {
+        code: u16,
+        message: String,
+        detail: Option<Vec<String>>,
+    },
 }
 
 /// A list of features (addresses) returned by the API
@@ -91,4 +97,10 @@ impl fmt::Display for FilterType {
             FilterType::Municipality => write!(f, "municipality"),
         }
     }
+}
+#[derive(Debug, serde::Deserialize)]
+pub(crate) struct ApiErrorResponse {
+    pub code: u16,
+    pub message: String,
+    pub detail: Option<Vec<String>>,
 }
