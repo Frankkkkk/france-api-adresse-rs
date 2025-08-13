@@ -44,10 +44,10 @@ pub struct GeometryResult {
 #[derive(Deserialize, Debug)]
 pub struct Coordinates {
     #[serde(rename = "0")]
-    pub lat: f64,
+    pub lon: f64,
 
     #[serde(rename = "1")]
-    pub lon: f64,
+    pub lat: f64,
 }
 
 /// An Address returned by the API
