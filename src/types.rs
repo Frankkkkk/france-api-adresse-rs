@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::Deserialize;
 
 #[derive(Debug, thiserror::Error)]
@@ -14,20 +16,20 @@ pub enum Error {
 #[derive(Deserialize, Debug)]
 pub struct AddressResult {
     pub r#type: String,
-    pub features: Vec<Feature>,
+    pub features: Vec<FeatureResult>,
 }
 
 /// A feature is basically a single address + its coordinates
 #[derive(Deserialize, Debug)]
-pub struct Feature {
+pub struct FeatureResult {
     pub r#type: String,
-    pub geometry: Geometry,
-    pub properties: Properties,
+    pub geometry: GeometryResult,
+    pub properties: PropertiesResult,
 }
 
 /// Basically the point of the address
 #[derive(Deserialize, Debug)]
-pub struct Geometry {
+pub struct GeometryResult {
     pub r#type: String,
     pub coordinates: Coordinates,
 }
@@ -44,7 +46,7 @@ pub struct Coordinates {
 
 /// An Address returned by the API
 #[derive(Deserialize, Debug)]
-pub struct Properties {
+pub struct PropertiesResult {
     pub id: String,
 
     pub score: f64,
@@ -70,4 +72,23 @@ pub struct Properties {
     pub citycode: String,
 
     pub context: String,
+}
+
+/// Filter types for geocoding and reverse geocoding queries
+#[derive(Debug, Clone)]
+pub enum FilterType {
+    HouseNumber,
+    Street,
+    Locality,
+    Municipality,
+}
+impl fmt::Display for FilterType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            FilterType::HouseNumber => write!(f, "housenumber"),
+            FilterType::Street => write!(f, "street"),
+            FilterType::Locality => write!(f, "locality"),
+            FilterType::Municipality => write!(f, "municipality"),
+        }
+    }
 }

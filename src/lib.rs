@@ -8,22 +8,35 @@
 //! - Reverse geocoding: convert coordinates into address details
 //!
 //! # Example
-//! ```
-//! use france_api_adresse::blocking_api::{get_address_info, get_reverse_info};
+//! ```rust
+//! use france_api_adresse;
+//! let api = france_api_adresse::client::BAN::default();
+//! let search = api.geocode("Route du marais".to_string());
 //!
-//! let address_result = get_address_info("38 Rue des Blancs Manteaux").unwrap();
-//! let reverse_result = get_reverse_info(2.3522, 48.8566).unwrap();
-//! ```
-//! Or using the async API:
-//! ```
-//! #[tokio::main]
-//! async fn main() {
-//! use france_api_adresse::async_api::{get_address_info, get_reverse_info};
+//! // Narrow the results to post code 74380
+//! let search = search.postcode("74380");
 //!
-//! let address_result = get_address_info("38 Rue des Blancs Manteaux").await.unwrap();
-//! let reverse_result = get_reverse_info(2.3522, 48.8566).await.unwrap();
+//! // Narrow the results to city "Cranves-Sales"
+//! let search = search.city("Cranves-Sales".to_string());
+//!
+//! // Get the results
+//! let result = search.execute_blocking().unwrap();
+//! for result in result.features {
+//!     println!("Address: {}", result.properties.label);
+//!     println!("Coords: {:?}", result.geometry.coordinates);
 //! }
 //! ```
+//!
+//! You can use async mode by enabling the `async` feature in your `Cargo.toml`. Example:
+//! ```rust
+//! #[tokio::main]
+//! async fn main() {
+//!     let api = france_api_adresse::client::BAN::default();
+//!     let search = api.geocode("Route du marais".to_string());
+//!     let results = search.execute_async().await.unwrap();
+//! }
+//! ```
+
 //!
 //! # Errors
 //! Errors are returned as a custom `Error` enum to distinguish between HTTP,
@@ -31,9 +44,7 @@
 //!
 //!
 
-pub mod async_api;
-pub mod blocking_api;
+pub mod client;
+pub mod geocode;
+pub mod reverse;
 pub mod types;
-
-const API_URL_SEARCH: &str = "https://data.geopf.fr/geocodage/search/?q=";
-const API_URL_REVERSE: &str = "https://data.geopf.fr/geocodage/reverse/?";
