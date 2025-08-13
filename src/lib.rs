@@ -9,10 +9,20 @@
 //!
 //! # Example
 //! ```
-//! use france_api_adresse::blocking::{get_address_info, get_reverse_info};
+//! use france_api_adresse::blocking_api::{get_address_info, get_reverse_info};
 //!
 //! let address_result = get_address_info("38 Rue des Blancs Manteaux").unwrap();
 //! let reverse_result = get_reverse_info(2.3522, 48.8566).unwrap();
+//! ```
+//! Or using the async API:
+//! ```
+//! #[tokio::main]
+//! async fn main() {
+//! use france_api_adresse::async_api::{get_address_info, get_reverse_info};
+//!
+//! let address_result = get_address_info("38 Rue des Blancs Manteaux").await.unwrap();
+//! let reverse_result = get_reverse_info(2.3522, 48.8566).await.unwrap();
+//! }
 //! ```
 //!
 //! # Errors
@@ -21,7 +31,8 @@
 //!
 //!
 
-pub mod blocking;
+pub mod async_api;
+pub mod blocking_api;
 pub mod types;
 
 const API_URL_SEARCH: &str = "https://data.geopf.fr/geocodage/search/?q=";

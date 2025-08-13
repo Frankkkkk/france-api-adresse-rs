@@ -36,7 +36,7 @@ pub fn get_reverse_info(lon: f64, lat: f64) -> Result<AddressResult, Error> {
 
 #[cfg(test)]
 mod tests {
-    use crate::blocking::{get_address_info, get_reverse_info};
+    use crate::blocking_api::{get_address_info, get_reverse_info};
 
     #[test]
     fn test_get_address_info() {
