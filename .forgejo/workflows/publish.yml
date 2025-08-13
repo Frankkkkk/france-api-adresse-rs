@@ -3,6 +3,9 @@ on:
   push:
     tags:
       - 'v*'
+
+enable-email-notifications: true
+
 jobs:
   publish:
     runs-on: ubuntu-latest
